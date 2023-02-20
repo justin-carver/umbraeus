@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { Inter } from '@next/font/google';
-import { Button, Stack, Title } from '@mantine/core';
+import { Stack, Title } from '@mantine/core';
 import Umbraeus from './components/Umbraeus';
 
 import styles from '@/styles/Home.module.css';
@@ -10,6 +10,17 @@ const inter = Inter({ subsets: ['latin'] });
 // TODO: Validate POST requests using special authorized cookie or token.
 
 const Home = () => {
+	const callAPI = async () => {
+		try {
+			const res = await fetch('api/queryWallpapers', {
+				method: 'GET',
+			});
+			const data = await res.json();
+			console.log(data);
+		} catch (err) {
+			console.log(err);
+		}
+	};
 	return (
 		<>
 			<Head>
@@ -32,7 +43,7 @@ const Home = () => {
 						UMBRAEUS
 					</Title>
 					<div className={styles.hr} />
-					{/* <Umbraeus /> */}
+					<Umbraeus />
 				</Stack>
 			</main>
 		</>

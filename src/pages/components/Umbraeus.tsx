@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { Flex } from '@mantine/core';
 import { wallpaper } from '../../types';
 
+import styles from '@/styles/Umbraeus.module.css';
+
 const Umbraeus = () => {
 	const [images, setImages] = useState<wallpaper[]>([]);
 	const [loading, setLoading] = useState(false);
@@ -32,9 +34,16 @@ const Umbraeus = () => {
 	}, []);
 
 	return (
-		<Flex>
+		<Flex
+			align={'flex-start'}
+			justify={'flex-start'}
+			direction={'row'}
+			wrap={'wrap'}
+			gap={'xl'}>
 			{images.map((image: wallpaper) => (
-				<Image key={image.id} src={''} alt={''} />
+				<div key={Math.random()} className={styles.wallpaper_image}>
+					<Image width={'440px'} src={image.src} alt={image.alt} />
+				</div>
 			))}
 			{loading && <div>Loading more images...</div>}
 		</Flex>
