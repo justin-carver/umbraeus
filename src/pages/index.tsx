@@ -1,16 +1,20 @@
 import Head from 'next/head';
 import { Inter } from '@next/font/google';
+import { useState } from 'react';
 import { Stack, Title } from '@mantine/core';
 
 import Umbraeus from './components/Umbraeus';
 
 import styles from '@/styles/Home.module.css';
+import ScrollToTop from './components/ScrollToTop';
 
 const inter = Inter({ subsets: ['latin'] });
 
 // TODO: Validate POST requests using special authorized cookie or token.
 
 const Home = () => {
+	const [showAffix, setAffix] = useState(false);
+
 	return (
 		<>
 			<Head>
@@ -42,9 +46,9 @@ const Home = () => {
 							wallpapers.
 						</Title>
 					</Stack>
-					{/* <div className={styles.hr} /> */}
-					<Umbraeus />
+					<Umbraeus showAffix={setAffix} />
 				</Stack>
+				<ScrollToTop affix={showAffix} />
 			</main>
 		</>
 	);

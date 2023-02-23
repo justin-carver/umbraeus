@@ -1,33 +1,25 @@
 import { useState, useEffect } from 'react';
 import { Flex, Text, Stack, BackgroundImage } from '@mantine/core';
+import { useScrollLock } from '@mantine/hooks';
 import { wallpaper } from '../../types';
 
 import styles from '@/styles/Umbraeus.module.css';
 import Lightbox from './Lightbox';
 
+/**
+ * Typically for normal resolution thumbnails, 'medium' (m) is preferred.
+ */
+
 // TODO: At some point, the image should become a separate component.
 
-const Umbraeus = () => {
+const Umbraeus = (props: any) => {
 	const [images, setImages] = useState<wallpaper[]>([]);
+	const [selectedImage, setSelectedImage] = useState<{}>();
 	const [loading, setLoading] = useState(false);
-	const [lightbox, setLightbox] = useState(false);
+	const [showLightbox, setLightbox] = useState(false);
 	const [pageNumber, setPageNumber] = useState(1);
 
-	useEffect(() => {
-		setLoading(true);
-		fetch(`/api/queryWallpapers?page=${pageNumber}`)
-			.then((response) => response.json())
-			.then((data) => {
-				if (data.count) {
-					setImages((prevImages) => [
-						...prevImages,
-						...data.documents,
-					]);
-					setLoading(false);
-				} else {
-				}
-			});
-	}, [pageNumber]);
+	const [scrollLocked, setScrollLocked] = useScrollLock();
 
 	const handleScroll = () => {
 		const { scrollTop, scrollHeight, clientHeight } =
@@ -37,14 +29,59 @@ const Umbraeus = () => {
 		}
 	};
 
+	const handleImageClick = () => {
+		props.showAffix(true);
+		setLightbox(true);
+	};
+
+	// Strictly for Imgur related URL requests.
+	const regulateResolution = (str: string, letter: string): string => {
+		const lastPeriodIndex = str.lastIndexOf('.');
+		if (lastPeriodIndex === -1) {
+			return str;
+		} else {
+			return (
+				str.slice(0, lastPeriodIndex) +
+				letter +
+				str.slice(lastPeriodIndex)
+			);
+		}
+	};
+
+	useEffect(() => {
+		setLoading(true);
+		fetch(`/api/queryWallpapers?page=${pageNumber}`)
+			.then((response) => response.json())
+			.then((data) => {
+				if (data.documents) {
+					setImages((prevImages) => [
+						...prevImages,
+						...data.documents,
+					]);
+					setLoading(false);
+				}
+			});
+	}, [pageNumber]);
+
 	useEffect(() => {
 		window.addEventListener('scroll', handleScroll);
 		return () => window.removeEventListener('scroll', handleScroll);
 	}, []);
 
+	useEffect(() => {
+		setScrollLocked((c) => !c);
+		props.showAffix(true);
+	}, [showLightbox]);
+
 	return (
 		<>
-			{lightbox && <Lightbox />}
+			{showLightbox && (
+				<Lightbox
+					showLightbox={showLightbox}
+					setLightbox={setLightbox}
+					image={selectedImage}
+				/>
+			)}
 			<Flex
 				align={'flex-start'}
 				justify={'flex-start'}
@@ -56,11 +93,12 @@ const Umbraeus = () => {
 						key={Math.random()}
 						className={styles.wrapper}
 						onClick={() => {
-							// This should open the <Lightbox />
+							handleImageClick();
+							setSelectedImage(image);
 						}}>
 						<BackgroundImage
 							className={styles.image}
-							src={image.src}>
+							src={regulateResolution(image.src, 'm')}>
 							<Stack
 								className={`${styles.fade} ${styles.image_stack}`}
 								p={10}
