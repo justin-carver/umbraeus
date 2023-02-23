@@ -1,7 +1,75 @@
-.wallpaper_image {
-	-webkit-box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.15);
-	-moz-box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.15);
-	box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.15);
+.author {
+	margin-bottom: -15px;
+	font-weight: 100;
+	color: #999999;
+}
+
+.image {
+	width: 425px;
+	height: 240px;
+}
+
+.image_stack {
+	color: white;
+	height: 225px;
+	font-weight: 200;
+	letter-spacing: 0.05rem;
+	opacity: 0;
+	user-select: none;
+}
+
+.fade {
+	opacity: 0;
+	transition: opacity 0.5s ease-in-out;
+}
+
+.fade:hover {
+	opacity: 1;
+}
+
+.fade::before {
+	opacity: 1;
+	transition: opacity 0.5s ease-in-out;
+}
+
+.fade:hover::before {
+	opacity: 0;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes fadeOut {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
+.wrapper {
+	-webkit-box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.2);
+	-moz-box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.2);
+	box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.2);
 	border-image: rounded 10px !important;
 	border: 1px solid rgba(255, 255, 255, 0.1);
+	transition: border-color 0.5s ease;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.wrapper:hover {
+	border-color: rgba(255, 255, 255, 0.3);
+	cursor: pointer;
+}
+
+.wrapper a {
+	text-decoration: none;
 }

@@ -21,13 +21,22 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 	}
 
 	const page = Number(req.query.page) || 1; // get the page number from query or default to page 1
-	const perPage = 6; // number of items to show per page
+	const perPage = 25; // number of items to show per page
 
-	const documents = await Wallpaper.find()
-		.skip((page - 1) * perPage)
-		.limit(perPage);
+	const [documents, count] = await Promise.all([
+		Wallpaper.find()
+			.skip((page - 1) * perPage)
+			.limit(perPage),
+		Wallpaper.countDocuments(),
+	]);
 
-	res.status(200).json(documents);
+	if (page * perPage < count) {
+		// More documents are available
+		res.status(200).json({ documents, count });
+	} else {
+		// All documents have been fetched
+		res.status(200).json(documents);
+	}
 };
 
 export default handler;
