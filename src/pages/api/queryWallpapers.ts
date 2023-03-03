@@ -8,8 +8,10 @@ const connectToDatabase = async () => {
 	if (cachedDb) {
 		return cachedDb;
 	}
+
 	const db = mongoose.connect(process.env.MONGO_URI as string);
 	cachedDb = db;
+
 	return db;
 };
 
@@ -20,22 +22,29 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 		console.log(`Cannot connect to database!\n${e}`);
 	}
 
-	const page = Number(req.query.page) || 1; // get the page number from query or default to page 1
-	const perPage = 25; // number of items to show per page
+	const page = Number(req.query.page) || 1;
+	const perPage = 16;
+	const startIndex = (page - 1) * perPage;
 
-	const [documents, count] = await Promise.all([
-		Wallpaper.find()
-			.skip((page - 1) * perPage)
-			.limit(perPage),
-		Wallpaper.countDocuments(),
-	]);
+	try {
+		const totalDocuments = await Wallpaper.countDocuments();
+		const totalPages = Math.ceil(totalDocuments / perPage);
 
-	if (page * perPage < count) {
-		// More documents are available
-		res.status(200).json({ documents, count });
-	} else {
-		// All documents have been fetched
-		res.status(200).json(documents);
+		if (page > totalPages) {
+			// Return empty response for invalid page number
+			return res.status(200).json({ documents: [], totalPages });
+		}
+
+		const documents = await Wallpaper.find()
+			.skip(startIndex)
+			.limit(perPage)
+			.sort({ _id: -1 }) // newest first
+			.exec();
+
+		return res.status(200).json({ documents, totalPages });
+	} catch (error) {
+		console.error(error);
+		return res.status(500).json({ message: 'Something went wrong.' });
 	}
 };
 

@@ -1,6 +1,14 @@
 import { useHover } from '@mantine/hooks';
 import { AiFillCloseCircle, AiOutlineCloseCircle } from 'react-icons/ai';
-import { Container, Title, Group, Text, Stack, Image } from '@mantine/core';
+import {
+	Container,
+	Center,
+	Title,
+	Group,
+	Text,
+	Stack,
+	Image,
+} from '@mantine/core';
 
 import styles from '@/styles/Lightbox.module.css';
 
@@ -12,9 +20,12 @@ const Lightbox = (props: any) => {
 			<div
 				className={`${styles.lightbox_bg} ${
 					props.showLightbox ? styles.show : ''
-				}`}></div>
-			<Container className={styles.lightbox_wrapper} size={'xl'}>
-				<Stack>
+				}`}
+				onClick={() => {
+					console.log('Clicking on the background?');
+				}}></div>
+			<Center className={styles.lightbox_wrapper}>
+				<Stack className={styles.stack}>
 					<Group className={styles.close} position={'right'}>
 						<div
 							ref={ref}
@@ -33,6 +44,9 @@ const Lightbox = (props: any) => {
 							src={props.image.src}
 							alt={props.image.alt}
 							withPlaceholder
+							placeholder={
+								<div className={styles.placeholder}></div>
+							}
 						/>
 						<Group>
 							<Stack>
@@ -42,7 +56,7 @@ const Lightbox = (props: any) => {
 						</Group>
 					</Group>
 				</Stack>
-			</Container>
+			</Center>
 		</>
 	);
 };

@@ -19,16 +19,21 @@
 
 .lightbox_wrapper {
 	display: flex;
+	position: absolute;
+	top: 14rem;
 	justify-content: center;
+	align-content: center;
+	flex-direction: row;
 	align-items: center;
-	position: fixed;
-	top: 0;
-	left: 50;
-	height: 100%;
-	width: 100%;
+	width: auto;
+	height: auto;
 	z-index: 1000;
 	user-select: none;
 	transition: opacity 0.5s ease-in-out;
+}
+
+.lightbox {
+	width: 60vw;
 }
 
 .lightbox img {
@@ -45,4 +50,9 @@
 .lightbox h4 {
 	font-weight: 200;
 	letter-spacing: 0.2rem;
+}
+
+.placeholder {
+	width: 400px;
+	height: 600px;
 }

@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Flex, Text, Stack, BackgroundImage } from '@mantine/core';
-import { useScrollLock } from '@mantine/hooks';
 import { wallpaper } from '../../types';
 
 import styles from '@/styles/Umbraeus.module.css';
@@ -18,8 +17,6 @@ const Umbraeus = (props: any) => {
 	const [loading, setLoading] = useState(false);
 	const [showLightbox, setLightbox] = useState(false);
 	const [pageNumber, setPageNumber] = useState(1);
-
-	const [scrollLocked, setScrollLocked] = useScrollLock();
 
 	const handleScroll = () => {
 		const { scrollTop, scrollHeight, clientHeight } =
@@ -48,9 +45,9 @@ const Umbraeus = (props: any) => {
 		}
 	};
 
-	useEffect(() => {
+	const loadImages = (page: number) => {
 		setLoading(true);
-		fetch(`/api/queryWallpapers?page=${pageNumber}`)
+		fetch(`/api/queryWallpapers?page=${page}`)
 			.then((response) => response.json())
 			.then((data) => {
 				if (data.documents) {
@@ -60,18 +57,24 @@ const Umbraeus = (props: any) => {
 					]);
 					setLoading(false);
 				}
+			})
+			.catch((error) => {
+				console.error(error);
+				setLoading(false);
 			});
+	};
+
+	useEffect(() => {
+		if (pageNumber > 1) {
+			loadImages(pageNumber);
+		}
 	}, [pageNumber]);
 
 	useEffect(() => {
+		loadImages(pageNumber);
 		window.addEventListener('scroll', handleScroll);
 		return () => window.removeEventListener('scroll', handleScroll);
 	}, []);
-
-	useEffect(() => {
-		setScrollLocked((c) => !c);
-		props.showAffix(true);
-	}, [showLightbox]);
 
 	return (
 		<>
@@ -83,7 +86,7 @@ const Umbraeus = (props: any) => {
 				/>
 			)}
 			<Flex
-				align={'flex-start'}
+				align={'end'}
 				justify={'flex-start'}
 				direction={'row'}
 				wrap={'wrap'}
@@ -98,7 +101,7 @@ const Umbraeus = (props: any) => {
 						}}>
 						<BackgroundImage
 							className={styles.image}
-							src={regulateResolution(image.src, 'm')}>
+							src={regulateResolution(image.src, 'l')}>
 							<Stack
 								className={`${styles.fade} ${styles.image_stack}`}
 								p={10}
