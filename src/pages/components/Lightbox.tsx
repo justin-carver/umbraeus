@@ -41,18 +41,28 @@ const Lightbox = (props: any) => {
 						</div>
 					</Group>
 					<Group className={styles.lightbox}>
-						<Image
-							src={props.image.src}
-							alt={props.image.alt}
-							withPlaceholder
-							placeholder={
-								<div className={styles.placeholder}></div>
-							}
-						/>
+						{props.image !== undefined && (
+							<Image
+								src={props.image.src}
+								alt={props.image.alt}
+								withPlaceholder
+								placeholder={
+									<div className={styles.placeholder}></div>
+								}
+							/>
+						)}
 						<Group>
 							<Stack>
-								<Title order={2}>{props.image.title}</Title>
-								<Title order={4}>{props.image.author}</Title>
+								{props.image !== undefined && (
+									<>
+										<Title order={2}>
+											{props.image.title}
+										</Title>
+										<Title order={4}>
+											{props.image.author}
+										</Title>
+									</>
+								)}
 							</Stack>
 						</Group>
 					</Group>
