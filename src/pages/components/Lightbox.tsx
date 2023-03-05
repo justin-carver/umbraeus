@@ -1,29 +1,30 @@
+import { useState } from 'react';
 import { useHover } from '@mantine/hooks';
 import { AiFillCloseCircle, AiOutlineCloseCircle } from 'react-icons/ai';
-import {
-	Container,
-	Center,
-	Title,
-	Group,
-	Text,
-	Stack,
-	Image,
-} from '@mantine/core';
+import { Overlay, Center, Title, Group, Stack, Image } from '@mantine/core';
+import { useScrollLock } from '@mantine/hooks';
+import { useEffect } from 'react';
 
 import styles from '@/styles/Lightbox.module.css';
 
 const Lightbox = (props: any) => {
 	const { hovered, ref } = useHover();
+	const [visible, setVisible] = useState(true);
+	const [scrollLock, setLockState] = useScrollLock(false);
+
+	useEffect(() => {
+		setLockState((c) => !c);
+	}, [visible]);
 
 	return (
 		<>
-			<div
-				className={`${styles.lightbox_bg} ${
-					props.showLightbox ? styles.show : ''
-				}`}
-				onClick={() => {
-					console.log('Clicking on the background?');
-				}}></div>
+			{visible && (
+				<Overlay
+					className={styles.overlay}
+					color="#000"
+					opacity={0.7}
+				/>
+			)}
 			<Center className={styles.lightbox_wrapper}>
 				<Stack className={styles.stack}>
 					<Group className={styles.close} position={'right'}>

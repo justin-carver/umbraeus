@@ -121,7 +121,7 @@ const Umbraeus = (props: any) => {
 				))}
 				{loading}
 			</Flex>
-			<Text>You&apos;ve made it to the end! 🥳</Text>
+			<Text>You made it to the end! 🥳</Text>
 		</>
 	);
 };

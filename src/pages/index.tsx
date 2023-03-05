@@ -1,14 +1,12 @@
 import Head from 'next/head';
 import { Inter } from '@next/font/google';
 import { useState } from 'react';
-import { Stack, Title, Overlay } from '@mantine/core';
-import { useScrollLock } from '@mantine/hooks';
+import { Stack, Title } from '@mantine/core';
 
 import Umbraeus from './components/Umbraeus';
 
 import styles from '@/styles/Home.module.css';
 import ScrollToTop from './components/ScrollToTop';
-import Lightbox from './components/Lightbox';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -16,11 +14,6 @@ const inter = Inter({ subsets: ['latin'] });
 
 const Home = () => {
 	const [showAffix, setAffix] = useState(false);
-	const [visible, setVisible] = useState(false);
-
-	const [scrollLocked, setScrollLocked] = useScrollLock(false);
-
-	if (visible) setScrollLocked((c) => !c);
 
 	return (
 		<>
@@ -37,12 +30,6 @@ const Home = () => {
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
 			<main className={styles.main}>
-				{visible && (
-					<>
-						<Overlay color={'#000'} opacity={0.7} />
-						<Lightbox />
-					</>
-				)}
 				<Stack p={60} align={'center'} spacing={80}>
 					<Stack className={styles.title_group} align={'center'}>
 						<Title
