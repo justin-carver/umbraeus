@@ -21,7 +21,7 @@ const Umbraeus = (props: any) => {
 	const handleScroll = () => {
 		const { scrollTop, scrollHeight, clientHeight } =
 			document.documentElement;
-		if (scrollTop + clientHeight >= scrollHeight - 5 && !loading) {
+		if (scrollTop + clientHeight >= scrollHeight - 300 && !loading) {
 			setPageNumber((prevPageNumber) => prevPageNumber + 1);
 		}
 	};
