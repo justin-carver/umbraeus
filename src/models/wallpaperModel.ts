@@ -8,12 +8,15 @@ const wallpaperSchema = new Schema<wallpaper>(
 		author: String,
 		title: String,
 		views: Number,
+		likes: Number,
+		downloads: Number,
 		resolution: {
 			width: Number,
 			height: Number,
 		},
+		softDelete: Boolean,
 	},
-	{ timestamps: true, validateBeforeSave: true }
+	{ timestamps: true }
 );
 
 const Wallpaper = models.Wallpaper || model('Wallpaper', wallpaperSchema);

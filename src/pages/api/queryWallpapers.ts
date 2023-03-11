@@ -1,38 +1,51 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { wallpaper } from '../../types';
+import mongoose from 'mongoose';
+import Wallpaper from '@/models/wallpaperModel';
+import { NextApiRequest, NextApiResponse } from 'next';
 
-// TODO: Request mutliple webpages by ${pageNumber}
+let cachedDb: any = null;
 
-type Data = {
-	message?: string;
-	wallpapers?: wallpaper[];
-};
-
-// TODO: Begin to serve wallpapers at various spliced indexes from MongoDB instance.
-const queryWallpapers = (startIndex: number, endIndex: number): wallpaper[] => {
-	return [];
-};
-
-export default function handler(
-	req: NextApiRequest,
-	res: NextApiResponse<Data>
-) {
-	const { query } = req;
-	const page = req.query.page || 1;
-	const perPage = 20; // change this to the desired number of images per page
-	const startIndex = ((page as number) - 1) * perPage;
-	const endIndex = startIndex + perPage;
-
-	const images = queryWallpapers(startIndex, endIndex);
-
-	console.log(query.page);
-
-	if (req.method === 'GET') {
-		// Send a response
-		res.status(200).json({ wallpapers: queryWallpapers(0, 20) });
-	} else {
-		res.status(405).json({
-			message: 'This HTTP request method is not allowed.',
-		});
+const connectToDatabase = async () => {
+	if (cachedDb) {
+		return cachedDb;
 	}
-}
+
+	const db = mongoose.connect(process.env.MONGO_URI as string);
+	cachedDb = db;
+
+	return db;
+};
+
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+	try {
+		const db = await connectToDatabase();
+	} catch (e) {
+		console.log(`Cannot connect to database!\n${e}`);
+	}
+
+	const page = Number(req.query.page) || 1;
+	const perPage = 16;
+	const startIndex = (page - 1) * perPage;
+
+	try {
+		const totalDocuments = await Wallpaper.countDocuments();
+		const totalPages = Math.ceil(totalDocuments / perPage);
+
+		if (page > totalPages) {
+			// Return empty response for invalid page number
+			return res.status(200).json({ documents: [], totalPages });
+		}
+
+		const documents = await Wallpaper.find()
+			.skip(startIndex)
+			.limit(perPage)
+			.sort({ _id: -1 }) // newest first
+			.exec();
+
+		return res.status(200).json({ documents, totalPages });
+	} catch (error) {
+		console.error(error);
+		return res.status(500).json({ message: 'Something went wrong.' });
+	}
+};
+
+export default handler;
