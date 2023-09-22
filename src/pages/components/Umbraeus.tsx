@@ -17,14 +17,12 @@ import Lightbox from './Lightbox';
  * Typically for normal resolution thumbnails, 'medium' (m) is preferred.
  */
 
-// TODO: At some point, the image should become a separate component.
-// TODO: Add randomize sort button, remember that with local storage.
-
 const Umbraeus = (props: any) => {
 	const [images, setImages] = useState<wallpaper[]>([]);
 	const [sortedImages, setSortedImages] = useState<wallpaper[]>([]);
 	const [selectedImage, setSelectedImage] = useState<{}>();
 	const [loading, setLoading] = useState<boolean>(false);
+	const [isSorting, setIsSorting] = useState<boolean>(false);
 	const [showLightbox, setLightbox] = useState<boolean>(false);
 	const [pageNumber, setPageNumber] = useState<number>(1);
 	const [sortOption, setSortingOption] = useState<number>(0);
@@ -32,7 +30,7 @@ const Umbraeus = (props: any) => {
 	const sortingOptions: string[] = [
 		'Last Uploaded 🗓️',
 		'Random 🎲',
-		'Most Downloaded 🤩',
+		// 'Most Downloaded 🤩',
 	];
 
 	const handleScroll = () => {
@@ -82,6 +80,7 @@ const Umbraeus = (props: any) => {
 	};
 
 	const sortingButton = () => {
+		setIsSorting(true);
 		setSortingOption((prev) => (prev + 1) % sortingOptions.length);
 	};
 
@@ -93,22 +92,25 @@ const Umbraeus = (props: any) => {
 
 	useEffect(() => {
 		if (!images || images.length === 0) return;
-
 		let sorted: wallpaper[] = [...images];
 
-		// Check sortingOptions defined above
-		sorted.sort((a, b) => {
-			switch (sortOption) {
-				case 1:
-					return 0.5 - Math.random();
-				case 2:
-					return b.downloads - a.downloads;
-				default:
-					return 0;
-			}
-		});
+		if (isSorting) {
+			// Check sortingOptions defined above
+			sorted.sort((a, b) => {
+				switch (sortOption) {
+					case 1:
+						return 0.5 - Math.random();
+					case 2:
+						return b.downloads - a.downloads;
+					default:
+						return 0;
+				}
+			});
 
+			setIsSorting(false);
+		}
 		setSortedImages(sorted);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [sortOption, images]);
 
 	useEffect(() => {
