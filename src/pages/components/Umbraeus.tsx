@@ -1,6 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Flex, Text, Stack, BackgroundImage } from '@mantine/core';
+import {
+	Flex,
+	Text,
+	Stack,
+	BackgroundImage,
+	Loader,
+	Button,
+} from '@mantine/core';
 import { wallpaper } from '../../types';
+import { AiFillSmile } from 'react-icons/ai';
 
 import styles from '@/styles/Umbraeus.module.css';
 import Lightbox from './Lightbox';
@@ -10,13 +18,22 @@ import Lightbox from './Lightbox';
  */
 
 // TODO: At some point, the image should become a separate component.
+// TODO: Add randomize sort button, remember that with local storage.
 
 const Umbraeus = (props: any) => {
 	const [images, setImages] = useState<wallpaper[]>([]);
+	const [sortedImages, setSortedImages] = useState<wallpaper[]>([]);
 	const [selectedImage, setSelectedImage] = useState<{}>();
-	const [loading, setLoading] = useState(false);
-	const [showLightbox, setLightbox] = useState(false);
-	const [pageNumber, setPageNumber] = useState(1);
+	const [loading, setLoading] = useState<boolean>(false);
+	const [showLightbox, setLightbox] = useState<boolean>(false);
+	const [pageNumber, setPageNumber] = useState<number>(1);
+	const [sortOption, setSortingOption] = useState<number>(0);
+
+	const sortingOptions: string[] = [
+		'Last Uploaded 🗓️',
+		'Random 🎲',
+		'Most Downloaded 🤩',
+	];
 
 	const handleScroll = () => {
 		const { scrollTop, scrollHeight, clientHeight } =
@@ -64,6 +81,10 @@ const Umbraeus = (props: any) => {
 			});
 	};
 
+	const sortingButton = () => {
+		setSortingOption((prev) => (prev + 1) % sortingOptions.length);
+	};
+
 	useEffect(() => {
 		if (pageNumber > 1) {
 			loadImages(pageNumber);
@@ -71,9 +92,30 @@ const Umbraeus = (props: any) => {
 	}, [pageNumber]);
 
 	useEffect(() => {
+		if (!images || images.length === 0) return;
+
+		let sorted: wallpaper[] = [...images];
+
+		// Check sortingOptions defined above
+		sorted.sort((a, b) => {
+			switch (sortOption) {
+				case 1:
+					return 0.5 - Math.random();
+				case 2:
+					return b.downloads - a.downloads;
+				default:
+					return 0;
+			}
+		});
+
+		setSortedImages(sorted);
+	}, [sortOption, images]);
+
+	useEffect(() => {
 		loadImages(pageNumber);
 		window.addEventListener('scroll', handleScroll);
 		return () => window.removeEventListener('scroll', handleScroll);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	return (
@@ -85,13 +127,20 @@ const Umbraeus = (props: any) => {
 					image={selectedImage}
 				/>
 			)}
+			<Button
+				className={styles.sort_button}
+				color="gray"
+				size={'md'}
+				onClick={() => sortingButton()}>
+				{`Sorting by ${sortingOptions[sortOption]}`}
+			</Button>
 			<Flex
 				align={'end'}
 				justify={'flex-start'}
 				direction={'row'}
 				wrap={'wrap'}
 				gap={'xl'}>
-				{images.map((image: wallpaper) => (
+				{sortedImages.map((image: wallpaper) => (
 					<div
 						key={Math.random()}
 						className={styles.wrapper}
@@ -119,9 +168,17 @@ const Umbraeus = (props: any) => {
 						</BackgroundImage>
 					</div>
 				))}
-				{loading}
 			</Flex>
-			<Text>You made it to the end! 🥳</Text>
+			{!loading ? (
+				<Stack p={'xl'} spacing={'xl'}>
+					<Text>You made it to the end! 🥳</Text>
+				</Stack>
+			) : (
+				<>
+					<Loader size={60} color="gray" type="dots" />
+					<Text>Fetching dark wallpapers, hang tight!</Text>
+				</>
+			)}
 		</>
 	);
 };

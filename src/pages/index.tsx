@@ -2,6 +2,7 @@ import Head from 'next/head';
 import { Inter } from '@next/font/google';
 import { useState } from 'react';
 import { Stack, Title } from '@mantine/core';
+import { AiFillGithub } from 'react-icons/ai';
 
 import Umbraeus from './components/Umbraeus';
 
@@ -30,7 +31,7 @@ const Home = () => {
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
 			<main className={styles.main}>
-				<Stack p={60} align={'center'} spacing={80}>
+				<Stack align={'center'}>
 					<Stack className={styles.title_group} align={'center'}>
 						<Title
 							order={1}
@@ -44,6 +45,18 @@ const Home = () => {
 							<br />
 							Clean, high-quality, 2k - 8k+, dark-themed landscape
 							wallpapers.
+						</Title>
+						<Title
+							order={6}
+							className={`${inter.className} ${styles.madeby}`}>
+							Created by{' '}
+							<a href="https://github.com/justin-carver">
+								JUSTIN CARVER{' '}
+								<AiFillGithub
+									size={20}
+									className={styles.github}
+								/>
+							</a>
 						</Title>
 					</Stack>
 					<Umbraeus showAffix={setAffix} />
