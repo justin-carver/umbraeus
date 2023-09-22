@@ -4,10 +4,24 @@
 	background-color: rgba(255, 255, 255, 0.15);
 }
 
+.madeby {
+	letter-spacing: 0.1rem;
+}
+
+.madeby a {
+	color: #54cff4;
+	text-decoration: none;
+}
+
+.github {
+	vertical-align: bottom;
+}
+
 .main {
 	margin-left: auto;
 	margin-right: auto;
-	width: 75%;
+	width: 70%;
+	min-width: 40%;
 }
 
 .subtitle {
