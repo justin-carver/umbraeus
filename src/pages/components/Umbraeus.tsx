@@ -1,30 +1,30 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
 	Flex,
 	Text,
 	Stack,
+	Group,
 	BackgroundImage,
 	Loader,
 	Button,
+	HoverCard,
 } from '@mantine/core';
 import { wallpaper } from '../../types';
-import { AiFillSmile } from 'react-icons/ai';
 
 import styles from '@/styles/Umbraeus.module.css';
 import Lightbox from './Lightbox';
+import { AiOutlineInfoCircle } from 'react-icons/ai';
 
 /**
  * Typically for normal resolution thumbnails, 'medium' (m) is preferred.
  */
-
-// TODO: At some point, the image should become a separate component.
-// TODO: Add randomize sort button, remember that with local storage.
 
 const Umbraeus = (props: any) => {
 	const [images, setImages] = useState<wallpaper[]>([]);
 	const [sortedImages, setSortedImages] = useState<wallpaper[]>([]);
 	const [selectedImage, setSelectedImage] = useState<{}>();
 	const [loading, setLoading] = useState<boolean>(false);
+	const [isSorting, setIsSorting] = useState<boolean>(false);
 	const [showLightbox, setLightbox] = useState<boolean>(false);
 	const [pageNumber, setPageNumber] = useState<number>(1);
 	const [sortOption, setSortingOption] = useState<number>(0);
@@ -32,10 +32,19 @@ const Umbraeus = (props: any) => {
 	const sortingOptions: string[] = [
 		'Last Uploaded 🗓️',
 		'Random 🎲',
-		'Most Downloaded 🤩',
+		// 'Most Downloaded 🤩',
 	];
 
+	let lastScrollTime = 0;
+	const throttleDuration = 200; // milliseconds
+
 	const handleScroll = () => {
+		const now = new Date().getTime();
+
+		if (now - lastScrollTime < throttleDuration) return;
+
+		lastScrollTime = now;
+
 		const { scrollTop, scrollHeight, clientHeight } =
 			document.documentElement;
 		if (scrollTop + clientHeight >= scrollHeight - 300 && !loading) {
@@ -82,6 +91,7 @@ const Umbraeus = (props: any) => {
 	};
 
 	const sortingButton = () => {
+		setIsSorting(true);
 		setSortingOption((prev) => (prev + 1) % sortingOptions.length);
 	};
 
@@ -93,22 +103,25 @@ const Umbraeus = (props: any) => {
 
 	useEffect(() => {
 		if (!images || images.length === 0) return;
-
 		let sorted: wallpaper[] = [...images];
 
-		// Check sortingOptions defined above
-		sorted.sort((a, b) => {
-			switch (sortOption) {
-				case 1:
-					return 0.5 - Math.random();
-				case 2:
-					return b.downloads - a.downloads;
-				default:
-					return 0;
-			}
-		});
+		if (isSorting) {
+			// Check sortingOptions defined above
+			sorted.sort((a, b) => {
+				switch (sortOption) {
+					case 1:
+						return 0.5 - Math.random();
+					case 2:
+						return b.downloads - a.downloads;
+					default:
+						return 0;
+				}
+			});
 
+			setIsSorting(false);
+		}
 		setSortedImages(sorted);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [sortOption, images]);
 
 	useEffect(() => {
@@ -117,6 +130,8 @@ const Umbraeus = (props: any) => {
 		return () => window.removeEventListener('scroll', handleScroll);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
+
+	const hoverRef = useRef<HTMLDivElement>(null);
 
 	return (
 		<>
@@ -127,13 +142,46 @@ const Umbraeus = (props: any) => {
 					image={selectedImage}
 				/>
 			)}
-			<Button
-				className={styles.sort_button}
-				color="gray"
-				size={'md'}
-				onClick={() => sortingButton()}>
-				{`Sorting by ${sortingOptions[sortOption]}`}
-			</Button>
+			<Group spacing={10}>
+				<Button
+					className={styles.sort_button}
+					color="gray"
+					size={'md'}
+					onClick={() => sortingButton()}>
+					{`Sorting by ${sortingOptions[sortOption]}`}
+				</Button>
+				<HoverCard
+					shadow={'xl'}
+					withArrow
+					offset={10}
+					width={350}
+					position="right">
+					<HoverCard.Target>
+						<div ref={hoverRef}>
+							<AiOutlineInfoCircle size={28} />
+						</div>
+					</HoverCard.Target>
+					<HoverCard.Dropdown>
+						<Text size={'sm'} align="center">
+							I created a backend tool to help me upload these
+							beautiful wallpapers easily and without hassle! Best
+							of all, it&apos;s open source!
+							<br />
+							<br />✨ Check out{' '}
+							<a
+								href="https://github.com/justin-carver/umbravault/"
+								className={styles.url}>
+								UmbraVault! ✨
+							</a>
+						</Text>
+					</HoverCard.Dropdown>
+				</HoverCard>
+			</Group>
+			<Text size={'xs'} w={450} align={'center'} className={styles.info}>
+				These wallpapers are updated over an unspecified period of time,
+				at my personal discretion. Check back later for more! I&apos;ll
+				fix the broken links as reported.
+			</Text>
 			<Flex
 				align={'end'}
 				justify={'flex-start'}

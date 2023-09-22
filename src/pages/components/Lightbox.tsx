@@ -30,7 +30,6 @@ const Lightbox = (props: any) => {
 		img.src = props.image.src;
 		img.onload = () => {
 			setIsLoading(false);
-			
 		};
 	}, [props.image]);
 
